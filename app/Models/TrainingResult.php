@@ -14,6 +14,7 @@ class TrainingResult extends Model
         'precision',
         'recall',
         'f1_score',
+        'auc_roc',
         'confusion_matrix',
         'split_ratio'
     ];

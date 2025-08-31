@@ -5,12 +5,15 @@ import traceback
 import numpy as np
 import cv2
 import shutil
+import glob
 from sklearn.metrics import (
     confusion_matrix,
     accuracy_score,
     precision_score,
     recall_score,
     f1_score,
+    roc_curve,
+    auc
 )
 
 sys.stderr = sys.stdout
@@ -244,8 +247,42 @@ def build_model():
     return model
 
 
+def delete_old_models(split_percentage):
+    """Hapus model lama sebelum training dimulai"""
+    try:
+        model_dir = os.path.join(os.path.dirname(__file__), "model")
+        if os.path.exists(model_dir):
+            # Hapus model dengan split ratio tertentu
+            model_pattern = os.path.join(model_dir, f"xception_model_{split_percentage}*")
+            model_files = glob.glob(model_pattern)
+            
+            for model_file in model_files:
+                try:
+                    os.remove(model_file)
+                    print(f"Deleted old model: {model_file}", file=sys.stderr)
+                except Exception as e:
+                    print(f"Error deleting model {model_file}: {e}", file=sys.stderr)
+                    
+            # Hapus juga file checkpoint jika ada
+            checkpoint_pattern = os.path.join(model_dir, f"*{split_percentage}*")
+            checkpoint_files = glob.glob(checkpoint_pattern)
+            
+            for checkpoint_file in checkpoint_files:
+                try:
+                    if os.path.isfile(checkpoint_file):
+                        os.remove(checkpoint_file)
+                        print(f"Deleted old checkpoint: {checkpoint_file}", file=sys.stderr)
+                except Exception as e:
+                    print(f"Error deleting checkpoint {checkpoint_file}: {e}", file=sys.stderr)
+    except Exception as e:
+        print(f"Error in delete_old_models: {e}", file=sys.stderr)
+
+
 def train_model(split_percentage):
     try:
+        # Hapus model lama sebelum memulai training
+        delete_old_models(split_percentage)
+        
         print(f"Loading data for split ratio: {split_percentage}...", file=sys.stderr)
         X_train, X_test, y_train, y_test, test_filenames, test_types = load_data(
             split_percentage
@@ -279,6 +316,10 @@ def train_model(split_percentage):
         recall = recall_score(y_test, y_pred, zero_division=0)
         f1 = f1_score(y_test, y_pred, zero_division=0)
         cm = confusion_matrix(y_test, y_pred)
+        
+        # Calculate AUC-ROC
+        fpr, tpr, _ = roc_curve(y_test, y_pred_proba)
+        auc_roc = auc(fpr, tpr)
 
         predictions = []
         for i in range(len(test_filenames)):
@@ -304,6 +345,7 @@ def train_model(split_percentage):
             "precision": float(precision),
             "recall": float(recall),
             "f1_score": float(f1),
+            "auc_roc": float(auc_roc),
             "confusion_matrix": cm.tolist(),
             "split_ratio": split_percentage,
             "predictions": predictions,

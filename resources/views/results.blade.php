@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +12,6 @@
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-
         .sidebar .nav-link {
             color: white;
             padding: 15px 20px;
@@ -21,28 +19,23 @@
             margin: 5px 0;
             transition: all 0.3s;
         }
-
         .sidebar .nav-link:hover {
             background-color: rgba(255, 255, 255, 0.1);
             transform: translateX(5px);
         }
-
         .sidebar .nav-link.active {
             background-color: rgba(255, 255, 255, 0.2);
         }
-
         .main-content {
             margin-left: 250px;
             padding: 20px;
             width: calc(100% - 250px);
         }
-
         .card-hover:hover {
             transform: translateY(-5px);
             transition: all 0.3s;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
-
         .icon-circle {
             width: 50px;
             height: 50px;
@@ -52,7 +45,6 @@
             align-items: center;
             justify-content: center;
         }
-
         .confusion-matrix {
             display: grid;
             grid-template-columns: 100px 100px 100px;
@@ -63,7 +55,6 @@
             padding: 10px;
             border-radius: 8px;
         }
-
         .matrix-header {
             background-color: #e9ecef;
             display: flex;
@@ -73,7 +64,6 @@
             border: 1px solid #dee2e6;
             border-radius: 4px;
         }
-
         .matrix-cell {
             display: flex;
             align-items: center;
@@ -84,52 +74,42 @@
             border-radius: 4px;
             transition: transform 0.2s;
         }
-
         .matrix-cell:hover {
             transform: scale(1.05);
         }
-
         .true-positive {
             background-color: #d4edda;
             color: #155724;
         }
-
         .false-positive {
             background-color: #f8d7da;
             color: #721c24;
         }
-
         .false-negative {
             background-color: #f8d7da;
             color: #721c24;
         }
-
         .true-negative {
             background-color: #d4edda;
             color: #155724;
         }
-
         .img-thumbnail {
             max-width: 100px;
             max-height: 100px;
             object-fit: cover;
             border-radius: 4px;
         }
-
         .correct {
             background-color: #e6f4ea;
         }
-
         .incorrect {
             background-color: #f8d7da;
         }
-
         .chart-container {
             position: relative;
             height: 300px;
             width: 100%;
         }
-
         .progress-text {
             position: absolute;
             left: 50%;
@@ -139,65 +119,53 @@
             font-weight: bold;
             text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
         }
-
         .metric-description small {
             font-family: monospace;
             background-color: #f8f9fa;
             padding: 2px 5px;
             border-radius: 3px;
         }
-
         .empty-state {
             text-align: center;
             padding: 2rem;
         }
-
-        /* Improved pagination styling */
         .pagination .page-item .page-link {
             color: #667eea;
             border: 1px solid #dee2e6;
             margin: 0 3px;
             border-radius: 4px;
         }
-
         .pagination .page-item.active .page-link {
             background-color: #667eea;
             border-color: #667eea;
             color: white;
         }
-
         .pagination .page-item.disabled .page-link {
             color: #6c757d;
         }
-
         .pagination .page-item:not(.disabled):not(.active) .page-link:hover {
             background-color: #f1f5ff;
         }
-
         .matrix-comparison {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
             justify-content: center;
         }
-
         .matrix-card {
             flex: 1;
             min-width: 300px;
             max-width: 400px;
         }
-
         .no-data-message {
             text-align: center;
             padding: 40px 20px;
             color: #6c757d;
         }
-
         .no-data-message i {
             font-size: 3rem;
             margin-bottom: 15px;
         }
-
         .no-image-placeholder {
             width: 80px;
             height: 80px;
@@ -208,9 +176,25 @@
             border-radius: 4px;
             color: #6c757d;
         }
+        .success-criteria {
+            border-left: 4px solid;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        .criteria-met {
+            border-left-color: #28a745;
+            background-color: #f8fff9;
+        }
+        .criteria-not-met {
+            border-left-color: #dc3545;
+            background-color: #fff8f8;
+        }
+        .metric-badge {
+            font-size: 0.85rem;
+            padding: 0.35em 0.65em;
+        }
     </style>
 </head>
-
 <body>
     <div class="d-flex">
         <!-- Sidebar -->
@@ -239,7 +223,6 @@
                 </ul>
             </div>
         </div>
-
         <!-- Main Content -->
         <div class="main-content">
             <div class="container-fluid py-4">
@@ -253,15 +236,69 @@
                         </div>
                     </div>
                 </div>
-
                 @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
-
                 @if ($results)
+                    <!-- Success Criteria Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card shadow-sm card-hover">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Kriteria Keberhasilan Model</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="success-criteria {{ $successCriteria['f1_score']['achieved'] ? 'criteria-met' : 'criteria-not-met' }}">
+                                                <h6 class="d-flex justify-content-between align-items-center">
+                                                    <span>F1-Score ≥ 0.90</span>
+                                                    <span class="badge {{ $successCriteria['f1_score']['achieved'] ? 'bg-success' : 'bg-danger' }} metric-badge">
+                                                        {{ $successCriteria['f1_score']['achieved'] ? 'Tercapai' : 'Tidak Tercapai' }}
+                                                    </span>
+                                                </h6>
+                                                <p class="mb-1">Nilai saat ini: <strong>{{ number_format($successCriteria['f1_score']['value'], 4) }}</strong></p>
+                                                <div class="progress mt-2" style="height: 20px;">
+                                                    <div class="progress-bar {{ $successCriteria['f1_score']['achieved'] ? 'bg-success' : 'bg-danger' }}"
+                                                         role="progressbar"
+                                                         style="width: {{ min($successCriteria['f1_score']['value'] * 100, 100) }}%"
+                                                         aria-valuenow="{{ $successCriteria['f1_score']['value'] * 100 }}"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        {{ number_format($successCriteria['f1_score']['value'] * 100, 1) }}%
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="success-criteria {{ $successCriteria['auc_roc']['achieved'] ? 'criteria-met' : 'criteria-not-met' }}">
+                                                <h6 class="d-flex justify-content-between align-items-center">
+                                                    <span>AUC-ROC ≥ 0.95</span>
+                                                    <span class="badge {{ $successCriteria['auc_roc']['achieved'] ? 'bg-success' : 'bg-danger' }} metric-badge">
+                                                        {{ $successCriteria['auc_roc']['achieved'] ? 'Tercapai' : 'Tidak Tercapai' }}
+                                                    </span>
+                                                </h6>
+                                                <p class="mb-1">Nilai saat ini: <strong>{{ number_format($successCriteria['auc_roc']['value'], 4) }}</strong></p>
+                                                <div class="progress mt-2" style="height: 20px;">
+                                                    <div class="progress-bar {{ $successCriteria['auc_roc']['achieved'] ? 'bg-success' : 'bg-danger' }}"
+                                                         role="progressbar"
+                                                         style="width: {{ min($successCriteria['auc_roc']['value'] * 100, 100) }}%"
+                                                         aria-valuenow="{{ $successCriteria['auc_roc']['value'] * 100 }}"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        {{ number_format($successCriteria['auc_roc']['value'] * 100, 1) }}%
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Metrics Cards -->
                     <div class="row mb-4">
                         <div class="col-md-3 mb-3">
@@ -277,7 +314,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-3 mb-3">
                             <div class="card border-start border-info border-4 card-hover h-100">
                                 <div class="card-body">
@@ -291,7 +327,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-3 mb-3">
                             <div class="card border-start border-warning border-4 card-hover h-100">
                                 <div class="card-body">
@@ -305,7 +340,19 @@
                                 </div>
                             </div>
                         </div>
-
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-start border-primary border-4 card-hover h-100">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">AUC-ROC</h6>
+                                    <h3 class="card-title fw-bold text-primary mb-3">
+                                        {{ number_format($results->auc_roc * 100, 2) }}%
+                                    </h3>
+                                    <div class="metric-description">
+                                        <small class="text-muted">Area Under ROC Curve</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-md-3 mb-3">
                             <div class="card border-start border-danger border-4 card-hover h-100">
                                 <div class="card-body">
@@ -314,14 +361,12 @@
                                         {{ number_format($results->f1_score * 100, 2) }}%
                                     </h3>
                                     <div class="metric-description">
-                                        <small class="text-muted">2 × (Precision × Recall) / (Precision +
-                                            Recall)</small>
+                                        <small class="text-muted">2 × (Precision × Recall) / (Precision + Recall)</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <!-- Confusion Matrix Section -->
                     <div class="row mb-4">
                         <div class="col-12">
@@ -343,31 +388,22 @@
                                                 <div class="matrix-header">Predicted Real</div>
                                                 <div class="matrix-header">Predicted Fake</div>
                                                 <div class="matrix-header">Actual Real</div>
-                                                <div class="matrix-cell true-positive">{{ $confusion_matrix[0][0] }}
-                                                    (TN)</div>
-                                                <div class="matrix-cell false-negative">{{ $confusion_matrix[0][1] }}
-                                                    (FP)</div>
+                                                <div class="matrix-cell true-positive">{{ $confusion_matrix[0][0] }} (TN)</div>
+                                                <div class="matrix-cell false-negative">{{ $confusion_matrix[0][1] }} (FP)</div>
                                                 <div class="matrix-header">Actual Fake</div>
-                                                <div class="matrix-cell false-positive">{{ $confusion_matrix[1][0] }}
-                                                    (FN)</div>
-                                                <div class="matrix-cell true-negative">{{ $confusion_matrix[1][1] }}
-                                                    (TP)</div>
+                                                <div class="matrix-cell false-positive">{{ $confusion_matrix[1][0] }} (FN)</div>
+                                                <div class="matrix-cell true-negative">{{ $confusion_matrix[1][1] }} (TP)</div>
                                             </div>
                                             <div class="mt-3">
                                                 <p><strong>Keterangan:</strong></p>
                                                 <ul class="list-unstyled">
-                                                    <li><span class="true-positive p-2 d-inline-block">TN (True
-                                                            Negative)</span>: Real diprediksi sebagai Real</li>
-                                                    <li><span class="false-negative p-2 d-inline-block">FP (False
-                                                            Positive)</span>: Real diprediksi sebagai Fake</li>
-                                                    <li><span class="false-positive p-2 d-inline-block">FN (False
-                                                            Negative)</span>: Fake diprediksi sebagai Real</li>
-                                                    <li><span class="true-negative p-2 d-inline-block">TP (True
-                                                            Positive)</span>: Fake diprediksi sebagai Fake</li>
+                                                    <li><span class="true-positive p-2 d-inline-block">TN (True Negative)</span>: Real diprediksi sebagai Real</li>
+                                                    <li><span class="false-negative p-2 d-inline-block">FP (False Positive)</span>: Real diprediksi sebagai Fake</li>
+                                                    <li><span class="false-positive p-2 d-inline-block">FN (False Negative)</span>: Fake diprediksi sebagai Real</li>
+                                                    <li><span class="true-negative p-2 d-inline-block">TP (True Positive)</span>: Fake diprediksi sebagai Fake</li>
                                                 </ul>
                                             </div>
                                         </div>
-
                                         <!-- Chart -->
                                         <div class="col-md-6">
                                             <div class="chart-container">
@@ -379,152 +415,154 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Multiple Confusion Matrices Section -->
-                    <div class="row mb-4">
-                        <div class="col-12">
+                    <!-- Prediction Results Table -->
+                    <div class="row">
+                        <div class="col">
                             <div class="card shadow-sm card-hover">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0"><i class="fas fa-layer-group me-2"></i>Confusion Matrix
-                                        Comparison</h5>
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Uploaded Images with Predictions</h5>
+                                    <span class="badge bg-primary">Total: {{ $images->total() }}</span>
                                 </div>
                                 <div class="card-body">
-                                    <div class="matrix-comparison">
-                                        <!-- Matrix 90% -->
-                                        <div class="matrix-card card mb-4">
-                                            <div class="card-header bg-info text-white">
-                                                <h6 class="mb-0">Split Ratio: 90% Train / 10% Test</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                @if (isset($matrix90) && $matrix90)
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th width="80px">Preview</th>
+                                                    <th>Filename</th>
+                                                    <th>Actual Type</th>
+                                                    <th>Prediction</th>
+                                                    <th>Confidence</th>
+                                                    <th>Split</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($images as $image)
                                                     @php
-                                                        $confusion_matrix_90 = json_decode(
-                                                            $matrix90->confusion_matrix,
-                                                            true,
-                                                        );
+                                                        $isCorrect = $image->prediction && $image->type === $image->prediction;
+                                                        $imagePath = 'storage/' . $image->path;
+                                                        $fileExists = file_exists(public_path($imagePath)) || Storage::disk()->exists($image->path);
                                                     @endphp
-                                                    <div class="confusion-matrix mx-auto">
-                                                        <div class="matrix-header"></div>
-                                                        <div class="matrix-header">Predicted Real</div>
-                                                        <div class="matrix-header">Predicted Fake</div>
-                                                        <div class="matrix-header">Actual Real</div>
-                                                        <div class="matrix-cell true-positive">
-                                                            {{ $confusion_matrix_90[0][0] }} (TN)</div>
-                                                        <div class="matrix-cell false-negative">
-                                                            {{ $confusion_matrix_90[0][1] }} (FP)</div>
-                                                        <div class="matrix-header">Actual Fake</div>
-                                                        <div class="matrix-cell false-positive">
-                                                            {{ $confusion_matrix_90[1][0] }} (FN)</div>
-                                                        <div class="matrix-cell true-negative">
-                                                            {{ $confusion_matrix_90[1][1] }} (TP)</div>
-                                                    </div>
-                                                    <div class="mt-3 text-center">
-                                                        <p class="mb-1"><strong>Accuracy:
-                                                                {{ number_format($matrix90->accuracy * 100, 2) }}%</strong>
-                                                        </p>
-                                                        <p class="mb-0"><strong>F1-Score:
-                                                                {{ number_format($matrix90->f1_score * 100, 2) }}%</strong>
-                                                        </p>
-                                                    </div>
-                                                @else
-                                                    <div class="no-data-message">
-                                                        <i class="fas fa-inbox"></i>
-                                                        <p>Belum ada prediksi untuk rasio ini</p>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Matrix 80% -->
-                                        <div class="matrix-card card mb-4">
-                                            <div class="card-header bg-success text-white">
-                                                <h6 class="mb-0">Split Ratio: 80% Train / 20% Test</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                @if (isset($matrix80) && $matrix80)
-                                                    @php
-                                                        $confusion_matrix_80 = json_decode(
-                                                            $matrix80->confusion_matrix,
-                                                            true,
-                                                        );
-                                                    @endphp
-                                                    <div class="confusion-matrix mx-auto">
-                                                        <div class="matrix-header"></div>
-                                                        <div class="matrix-header">Predicted Real</div>
-                                                        <div class="matrix-header">Predicted Fake</div>
-                                                        <div class="matrix-header">Actual Real</div>
-                                                        <div class="matrix-cell true-positive">
-                                                            {{ $confusion_matrix_80[0][0] }} (TN)</div>
-                                                        <div class="matrix-cell false-negative">
-                                                            {{ $confusion_matrix_80[0][1] }} (FP)</div>
-                                                        <div class="matrix-header">Actual Fake</div>
-                                                        <div class="matrix-cell false-positive">
-                                                            {{ $confusion_matrix_80[1][0] }} (FN)</div>
-                                                        <div class="matrix-cell true-negative">
-                                                            {{ $confusion_matrix_80[1][1] }} (TP)</div>
-                                                    </div>
-                                                    <div class="mt-3 text-center">
-                                                        <p class="mb-1"><strong>Accuracy:
-                                                                {{ number_format($matrix80->accuracy * 100, 2) }}%</strong>
-                                                        </p>
-                                                        <p class="mb-0"><strong>F1-Score:
-                                                                {{ number_format($matrix80->f1_score * 100, 2) }}%</strong>
-                                                        </p>
-                                                    </div>
-                                                @else
-                                                    <div class="no-data-message">
-                                                        <i class="fas fa-inbox"></i>
-                                                        <p>Belum ada prediksi untuk rasio ini</p>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Matrix 70% -->
-                                        <div class="matrix-card card mb-4">
-                                            <div class="card-header bg-warning text-dark">
-                                                <h6 class="mb-0">Split Ratio: 70% Train / 30% Test</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                @if (isset($matrix70) && $matrix70)
-                                                    @php
-                                                        $confusion_matrix_70 = json_decode(
-                                                            $matrix70->confusion_matrix,
-                                                            true,
-                                                        );
-                                                    @endphp
-                                                    <div class="confusion-matrix mx-auto">
-                                                        <div class="matrix-header"></div>
-                                                        <div class="matrix-header">Predicted Real</div>
-                                                        <div class="matrix-header">Predicted Fake</div>
-                                                        <div class="matrix-header">Actual Real</div>
-                                                        <div class="matrix-cell true-positive">
-                                                            {{ $confusion_matrix_70[0][0] }} (TN)</div>
-                                                        <div class="matrix-cell false-negative">
-                                                            {{ $confusion_matrix_70[0][1] }} (FP)</div>
-                                                        <div class="matrix-header">Actual Fake</div>
-                                                        <div class="matrix-cell false-positive">
-                                                            {{ $confusion_matrix_70[1][0] }} (FN)</div>
-                                                        <div class="matrix-cell true-negative">
-                                                            {{ $confusion_matrix_70[1][1] }} (TP)</div>
-                                                    </div>
-                                                    <div class="mt-3 text-center">
-                                                        <p class="mb-1"><strong>Accuracy:
-                                                                {{ number_format($matrix70->accuracy * 100, 2) }}%</strong>
-                                                        </p>
-                                                        <p class="mb-0"><strong>F1-Score:
-                                                                {{ number_format($matrix70->f1_score * 100, 2) }}%</strong>
-                                                        </p>
-                                                    </div>
-                                                @else
-                                                    <div class="no-data-message">
-                                                        <i class="fas fa-inbox"></i>
-                                                        <p>Belum ada prediksi untuk rasio ini</p>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
+                                                    <tr class="{{ $isCorrect ? 'correct' : ($image->prediction ? 'incorrect' : '') }}">
+                                                        <td>
+                                                            @if ($fileExists)
+                                                                @php
+                                                                    $imageUrl = Storage::disk()->exists($image->path)
+                                                                        ? Storage::disk()->url($image->path)
+                                                                        : asset($imagePath);
+                                                                @endphp
+                                                                <img src="{{ $imageUrl }}" class="img-thumbnail"
+                                                                     alt="{{ $image->filename }}"
+                                                                     style="max-width: 80px; max-height: 80px;"
+                                                                     onclick="showImageModal('{{ $imageUrl }}')">
+                                                            @else
+                                                                <div class="no-image-placeholder">
+                                                                    <i class="fas fa-image"></i>
+                                                                </div>
+                                                            @endif
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <span data-bs-toggle="tooltip" title="{{ $image->filename }}">
+                                                                {{ Str::limit($image->filename, 25) }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <span class="badge rounded-pill bg-{{ $image->type == 'real' ? 'success' : 'danger' }}">
+                                                                {{ ucfirst($image->type) }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            @if ($image->prediction)
+                                                                <span class="badge rounded-pill bg-{{ $image->prediction == 'real' ? 'success' : 'danger' }}">
+                                                                    {{ ucfirst($image->prediction) }}
+                                                                </span>
+                                                            @else
+                                                                <span class="badge bg-secondary">Not predicted</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            @if ($image->confidence)
+                                                                <div class="progress" style="height: 20px;">
+                                                                    <div class="progress-bar bg-{{ $image->confidence > 0.7 ? 'success' : ($image->confidence > 0.4 ? 'warning' : 'danger') }}"
+                                                                         role="progressbar"
+                                                                         style="width: {{ $image->confidence * 100 }}%"
+                                                                         aria-valuenow="{{ $image->confidence * 100 }}"
+                                                                         aria-valuemin="0"
+                                                                         aria-valuemax="100">
+                                                                        {{ number_format($image->confidence * 100, 1) }}%
+                                                                    </div>
+                                                                </div>
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <span class="badge bg-{{ $image->split == 'train' ? 'primary' : 'info' }}">
+                                                                {{ ucfirst($image->split) }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            @if ($image->prediction)
+                                                                @if ($isCorrect)
+                                                                    <span class="badge bg-success rounded-pill">
+                                                                        <i class="fas fa-check me-1"></i>Correct
+                                                                    </span>
+                                                                @else
+                                                                    <span class="badge bg-danger rounded-pill">
+                                                                        <i class="fas fa-times me-1"></i>Incorrect
+                                                                    </span>
+                                                                @endif
+                                                            @else
+                                                                <span class="badge bg-secondary rounded-pill">N/A</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
+                                    @if ($images->hasPages())
+                                        <div class="d-flex justify-content-center mt-4">
+                                            <nav aria-label="Page navigation">
+                                                <ul class="pagination">
+                                                    @if ($images->onFirstPage())
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link"><i class="fas fa-angle-left"></i></span>
+                                                        </li>
+                                                    @else
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="{{ $images->previousPageUrl() }}" rel="prev">
+                                                                <i class="fas fa-angle-left"></i>
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                    @foreach ($images->getUrlRange(1, $images->lastPage()) as $page => $url)
+                                                        @if ($page == $images->currentPage())
+                                                            <li class="page-item active">
+                                                                <span class="page-link">{{ $page }}</span>
+                                                            </li>
+                                                        @else
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                                            </li>
+                                                        @endif
+                                                    @endforeach
+                                                    @if ($images->hasMorePages())
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="{{ $images->nextPageUrl() }}" rel="next">
+                                                                <i class="fas fa-angle-right"></i>
+                                                            </a>
+                                                        </li>
+                                                    @else
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link"><i class="fas fa-angle-right"></i></span>
+                                                        </li>
+                                                    @endif
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -532,186 +570,12 @@
                 @else
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         Belum ada data yang di prediksi pada ratio ini.
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"
-                            aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
-
-                <!-- Prediction Results Table -->
-                <div class="row">
-                    <div class="col">
-                        <div class="card shadow-sm card-hover">
-                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Uploaded Images with
-                                    Predictions</h5>
-                                <span class="badge bg-primary">Total: {{ $images->total() }}</span>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th width="80px">Preview</th>
-                                                <th>Filename</th>
-                                                <th>Actual Type</th>
-                                                <th>Prediction</th>
-                                                <th>Confidence</th>
-                                                <th>Split</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($images as $image)
-                                                @php
-                                                    $isCorrect =
-                                                        $image->prediction && $image->type === $image->prediction;
-                                                    $imagePath = 'storage/' . $image->path;
-                                                    $fileExists =
-                                                        file_exists(public_path($imagePath)) ||
-                                                        Storage::disk()->exists($image->path);
-                                                @endphp
-                                                <tr
-                                                    class="{{ $isCorrect ? 'correct' : ($image->prediction ? 'incorrect' : '') }}">
-                                                    <td>
-                                                        @if ($fileExists)
-                                                            @php
-                                                                $imageUrl = Storage::disk()->exists($image->path)
-                                                                    ? Storage::disk()->url($image->path)
-                                                                    : asset($imagePath);
-                                                            @endphp
-                                                            <img src="{{ $imageUrl }}" class="img-thumbnail"
-                                                                alt="{{ $image->filename }}"
-                                                                style="max-width: 80px; max-height: 80px;"
-                                                                onclick="showImageModal('{{ $imageUrl }}')">
-                                                        @else
-                                                            <div class="no-image-placeholder">
-                                                                <i class="fas fa-image"></i>
-                                                            </div>
-                                                        @endif
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <span data-bs-toggle="tooltip"
-                                                            title="{{ $image->filename }}">
-                                                            {{ Str::limit($image->filename, 25) }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <span
-                                                            class="badge rounded-pill bg-{{ $image->type == 'real' ? 'success' : 'danger' }}">
-                                                            {{ ucfirst($image->type) }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        @if ($image->prediction)
-                                                            <span
-                                                                class="badge rounded-pill bg-{{ $image->prediction == 'real' ? 'success' : 'danger' }}">
-                                                                {{ ucfirst($image->prediction) }}
-                                                            </span>
-                                                        @else
-                                                            <span class="badge bg-secondary">Not predicted</span>
-                                                        @endif
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        @if ($image->confidence)
-                                                            <div class="progress" style="height: 20px;">
-                                                                <div class="progress-bar bg-{{ $image->confidence > 0.7 ? 'success' : ($image->confidence > 0.4 ? 'warning' : 'danger') }}"
-                                                                    role="progressbar"
-                                                                    style="width: {{ $image->confidence * 100 }}%"
-                                                                    aria-valuenow="{{ $image->confidence * 100 }}"
-                                                                    aria-valuemin="0" aria-valuemax="100">
-                                                                    {{ number_format($image->confidence * 100, 1) }}%
-                                                                </div>
-                                                            </div>
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <span
-                                                            class="badge bg-{{ $image->split == 'train' ? 'primary' : 'info' }}">
-                                                            {{ ucfirst($image->split) }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        @if ($image->prediction)
-                                                            @if ($isCorrect)
-                                                                <span class="badge bg-success rounded-pill">
-                                                                    <i class="fas fa-check me-1"></i>Correct
-                                                                </span>
-                                                            @else
-                                                                <span class="badge bg-danger rounded-pill">
-                                                                    <i class="fas fa-times me-1"></i>Incorrect
-                                                                </span>
-                                                            @endif
-                                                        @else
-                                                            <span class="badge bg-secondary rounded-pill">N/A</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                @if ($images->hasPages())
-                                    <div class="d-flex justify-content-center mt-4">
-                                        <nav aria-label="Page navigation">
-                                            <ul class="pagination">
-                                                {{-- Previous Page Link --}}
-                                                @if ($images->onFirstPage())
-                                                    <li class="page-item disabled">
-                                                        <span class="page-link"><i
-                                                                class="fas fa-angle-left"></i></span>
-                                                    </li>
-                                                @else
-                                                    <li class="page-item">
-                                                        <a class="page-link" href="{{ $images->previousPageUrl() }}"
-                                                            rel="prev">
-                                                            <i class="fas fa-angle-left"></i>
-                                                        </a>
-                                                    </li>
-                                                @endif
-
-                                                {{-- Pagination Elements --}}
-                                                @foreach ($images->getUrlRange(1, $images->lastPage()) as $page => $url)
-                                                    @if ($page == $images->currentPage())
-                                                        <li class="page-item active">
-                                                            <span class="page-link">{{ $page }}</span>
-                                                        </li>
-                                                    @else
-                                                        <li class="page-item">
-                                                            <a class="page-link"
-                                                                href="{{ $url }}">{{ $page }}</a>
-                                                        </li>
-                                                    @endif
-                                                @endforeach
-
-                                                {{-- Next Page Link --}}
-                                                @if ($images->hasMorePages())
-                                                    <li class="page-item">
-                                                        <a class="page-link" href="{{ $images->nextPageUrl() }}"
-                                                            rel="next">
-                                                            <i class="fas fa-angle-right"></i>
-                                                        </a>
-                                                    </li>
-                                                @else
-                                                    <li class="page-item disabled">
-                                                        <span class="page-link"><i
-                                                                class="fas fa-angle-right"></i></span>
-                                                    </li>
-                                                @endif
-                                            </ul>
-                                        </nav>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-
     <!-- Image Modal -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -726,19 +590,16 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-
         function showImageModal(src) {
             document.getElementById('modalImage').src = src;
             new bootstrap.Modal(document.getElementById('imageModal')).show();
         }
-
         document.addEventListener('DOMContentLoaded', function() {
             @if ($results)
                 const ctx = document.getElementById('confusionMatrixChart').getContext('2d');
@@ -799,5 +660,4 @@
         });
     </script>
 </body>
-
 </html>

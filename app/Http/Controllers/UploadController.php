@@ -27,6 +27,16 @@ class UploadController extends Controller
         $bestAccuracyModel = TrainingResult::where('accuracy', $bestAccuracy)->first();
         $bestAccuracyRatio = $bestAccuracyModel ? $bestAccuracyModel->split_ratio : null;
 
+        // tampilan F1-score tertinggi
+        $bestF1Score = TrainingResult::max('f1_score');
+        $bestF1ScoreModel = TrainingResult::where('f1_score', $bestF1Score)->first();
+        $bestF1ScoreRatio = $bestF1ScoreModel ? $bestF1ScoreModel->split_ratio : null;
+
+        // tampilan AUC-ROC tertinggi
+        $bestAucRoc = TrainingResult::max('auc_roc');
+        $bestAucRocModel = TrainingResult::where('auc_roc', $bestAucRoc)->first();
+        $bestAucRocRatio = $bestAucRocModel ? $bestAucRocModel->split_ratio : null;
+
         $latestTraining = TrainingResult::latest()->first();
 
         return view('home', compact(
@@ -35,6 +45,10 @@ class UploadController extends Controller
             'totalImages',
             'bestAccuracy',
             'bestAccuracyRatio',
+            'bestF1Score',
+            'bestF1ScoreRatio',
+            'bestAucRoc',
+            'bestAucRocRatio',
             'latestTraining'
         ));
     }
@@ -305,6 +319,20 @@ class UploadController extends Controller
             ? Image::where('split_ratio', $latestSplitRatio)->whereNotNull('prediction')->paginate(50)
             : Image::whereNotNull('prediction')->paginate(50);
 
-        return view('results', compact('results', 'images', 'matrix90', 'matrix80', 'matrix70'));
+        // Check success criteria
+        $successCriteria = [
+            'f1_score' => [
+                'target' => 0.90,
+                'achieved' => $results ? $results->f1_score >= 0.90 : false,
+                'value' => $results ? $results->f1_score : 0
+            ],
+            'auc_roc' => [
+                'target' => 0.95,
+                'achieved' => $results ? $results->auc_roc >= 0.95 : false,
+                'value' => $results ? $results->auc_roc : 0
+            ]
+        ];
+
+        return view('results', compact('results', 'images', 'matrix90', 'matrix80', 'matrix70', 'successCriteria'));
     }
 }

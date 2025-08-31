@@ -13,6 +13,7 @@ use App\Models\Image;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Illuminate\Support\Facades\File;
 
 class TrainModelJob implements ShouldQueue
 {
@@ -33,6 +34,10 @@ class TrainModelJob implements ShouldQueue
         try {
             $pythonDir = base_path('python');
             $trainScript = $pythonDir . '/train.py';
+            $modelDir = $pythonDir . '/model';
+
+            // Hapus model lama jika ada
+            $this->deleteOldModel($modelDir, $this->split);
 
             if (!file_exists($trainScript)) {
                 throw new \Exception("Train script not found at: " . $trainScript);
@@ -101,6 +106,7 @@ class TrainModelJob implements ShouldQueue
                     'precision'      => $resultData['precision'] ?? 0,
                     'recall'         => $resultData['recall'] ?? 0,
                     'f1_score'       => $resultData['f1_score'] ?? 0,
+                    'auc_roc'        => $resultData['auc_roc'] ?? 0,
                     'confusion_matrix' => json_encode($resultData['confusion_matrix'] ?? []),
                     'split_ratio'    => $this->split
                 ]);
@@ -118,6 +124,32 @@ class TrainModelJob implements ShouldQueue
             Log::error("Training job failed: " . $e->getMessage());
             Log::error($e->getTraceAsString());
             throw $e;
+        }
+    }
+
+    private function deleteOldModel($modelDir, $split)
+    {
+        try {
+            if (File::exists($modelDir)) {
+                $modelFile = $modelDir . '/xception_model_' . $split . '.h5';
+                
+                if (File::exists($modelFile)) {
+                    File::delete($modelFile);
+                    Log::info("Deleted old model: " . $modelFile);
+                }
+                
+                // Hapus juga file model dengan pattern lain jika ada
+                $pattern = $modelDir . '/xception_model_' . $split . '*';
+                $files = glob($pattern);
+                foreach ($files as $file) {
+                    if (File::exists($file)) {
+                        File::delete($file);
+                        Log::info("Deleted old model file: " . $file);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning("Failed to delete old model: " . $e->getMessage());
         }
     }
 

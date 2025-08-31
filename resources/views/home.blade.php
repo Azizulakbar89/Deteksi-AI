@@ -88,12 +88,38 @@
         .comparison-chart {
             height: 250px;
         }
+        
+        .success-criteria {
+            border-left: 4px solid;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .criteria-met {
+            border-left-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        .criteria-not-met {
+            border-left-color: #dc3545;
+            background-color: #fff8f8;
+        }
+        
+        .metric-badge {
+            font-size: 0.85rem;
+            padding: 0.35em 0.65em;
+        }
+        
+        .split-ratio-display {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
 <body>
     <div class="d-flex">
-        <!-- Sidebar -->
         <div class="sidebar fixed-top" style="width: 250px;">
             <div class="p-3">
                 <h4 class="text-white text-center mb-4">
@@ -119,10 +145,8 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content">
             <div class="container-fluid py-4">
-                <!-- Page Header -->
                 <div class="row mb-4">
                     <div class="col">
                         <div class="page-header">
@@ -141,7 +165,47 @@
                     </div>
                 @endif
 
-                <!-- Summary Stats -->
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-success card-hover h-100">
+                            <div class="card-body text-center">
+                                <div class="icon-circle bg-success mx-auto mb-3">
+                                    <i class="fas fa-bullseye text-white"></i>
+                                </div>
+                                <h5 class="card-title">Akurasi Tertinggi</h5>
+                                <h3 class="text-success fw-bold">{{ number_format($bestAccuracy * 100, 2) }}%</h3>
+                                <p class="text-muted">Split Ratio: {{ $bestAccuracyRatio }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-danger card-hover h-100">
+                            <div class="card-body text-center">
+                                <div class="icon-circle bg-danger mx-auto mb-3">
+                                    <i class="fas fa-chart-line text-white"></i>
+                                </div>
+                                <h5 class="card-title">F1-Score Tertinggi</h5>
+                                <h3 class="text-danger fw-bold">{{ number_format($bestF1Score * 100, 2) }}%</h3>
+                                <p class="text-muted">Split Ratio: {{ $bestF1ScoreRatio }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-primary card-hover h-100">
+                            <div class="card-body text-center">
+                                <div class="icon-circle bg-primary mx-auto mb-3">
+                                    <i class="fas fa-chart-area text-white"></i>
+                                </div>
+                                <h5 class="card-title">AUC-ROC Tertinggi</h5>
+                                <h3 class="text-primary fw-bold">{{ number_format($bestAucRoc * 100, 2) }}%</h3>
+                                <p class="text-muted">Split Ratio: {{ $bestAucRocRatio }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mb-4">
                     <div class="col-md-3 mb-3">
                         <div class="card performance-card border-start-success card-hover h-100">
@@ -224,7 +288,6 @@
                     </div>
                 </div>
 
-                <!-- Performance Comparison Chart -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="card shadow-sm card-hover">
@@ -241,7 +304,6 @@
                     </div>
                 </div>
 
-                <!-- Models Table -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="card shadow-sm card-hover">
@@ -259,6 +321,7 @@
                                                 <th>Precision</th>
                                                 <th>Recall</th>
                                                 <th>F1-Score</th>
+                                                <th>AUC-ROC</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -289,6 +352,14 @@
                                                         <span class="fw-bold text-danger">
                                                             {{ number_format($result->f1_score * 100, 2) }}%
                                                         </span>
+                                                        <div class="split-ratio-display">
+                                                            Ratio: {{ $result->split_ratio }}%
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fw-bold text-primary">
+                                                            {{ number_format($result->auc_roc * 100, 2) }}%
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             @empty
@@ -315,7 +386,6 @@
                     </div>
                 </div>
 
-                <!-- Ratio Comparison -->
                 <div class="row">
                     @foreach ([90, 80, 70] as $ratio)
                         <div class="col-md-4 mb-4">
@@ -347,6 +417,27 @@
                                                 <div class="fw-bold text-danger">
                                                     {{ number_format($ratioData->f1_score * 100, 2) }}%
                                                 </div>
+                                                <div class="split-ratio-display">
+                                                    Ratio: {{ $ratio }}%
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row text-center mt-2">
+                                            <div class="col-6">
+                                                <small class="text-muted">AUC-ROC</small>
+                                                <div class="fw-bold text-primary">
+                                                    {{ number_format($ratioData->auc_roc * 100, 2) }}%
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted">Status</small>
+                                                <div>
+                                                    @if ($ratioData->f1_score >= 0.90 && $ratioData->auc_roc >= 0.95)
+                                                        <span class="badge bg-success">Berhasil</span>
+                                                    @else
+                                                        <span class="badge bg-danger">Belum Berhasil</span>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
                                     @else
@@ -373,6 +464,7 @@
             const precisions = {!! json_encode($trainingResults->pluck('precision')) !!};
             const recalls = {!! json_encode($trainingResults->pluck('recall')) !!};
             const f1Scores = {!! json_encode($trainingResults->pluck('f1_score')) !!};
+            const aucRocs = {!! json_encode($trainingResults->pluck('auc_roc')) !!};
 
             new Chart(performanceCtx, {
                 type: 'line',
@@ -407,6 +499,14 @@
                             data: f1Scores.map(f => f * 100),
                             borderColor: '#dc3545',
                             backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'AUC-ROC',
+                            data: aucRocs.map(a => a * 100),
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
                             tension: 0.3,
                             fill: true
                         }
@@ -444,19 +544,21 @@
                     new Chart(ctx{{ $ratio }}, {
                         type: 'doughnut',
                         data: {
-                            labels: ['Accuracy', 'Precision', 'Recall', 'F1-Score'],
+                            labels: ['Accuracy', 'Precision', 'Recall', 'F1-Score', 'AUC-ROC'],
                             datasets: [{
                                 data: [
                                     {{ $ratioData->accuracy * 100 }},
                                     {{ $ratioData->precision * 100 }},
                                     {{ $ratioData->recall * 100 }},
-                                    {{ $ratioData->f1_score * 100 }}
+                                    {{ $ratioData->f1_score * 100 }},
+                                    {{ $ratioData->auc_roc * 100 }}
                                 ],
                                 backgroundColor: [
                                     '#28a745',
                                     '#17a2b8',
                                     '#ffc107',
-                                    '#dc3545'
+                                    '#dc3545',
+                                    '#007bff'
                                 ]
                             }]
                         },
