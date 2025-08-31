@@ -29,7 +29,7 @@ return new class extends Migration
             $table->float('precision', 8, 6)->default(0);
             $table->float('recall', 8, 6)->default(0);
             $table->float('f1_score', 8, 6)->default(0);
-            $table->json('confusion_matrix');
+            $table->json('confusion_matrix')->nullable();
             $table->integer('split_ratio')->default(80)->nullable();
             $table->timestamps();
 
