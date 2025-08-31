@@ -12,7 +12,7 @@ use App\Models\TrainingResult;
 use App\Models\Image;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Exception;
 
 class TrainModelJob implements ShouldQueue
 {
@@ -35,92 +35,44 @@ class TrainModelJob implements ShouldQueue
             $trainScript = $pythonDir . '/train.py';
 
             if (!file_exists($trainScript)) {
-                throw new \Exception("Train script not found at: " . $trainScript);
+                throw new Exception("Train script not found at: " . $trainScript);
             }
 
-            $pythonPath = env('PYTHON_VENV_PATH', env('PYTHON_PATH', '/usr/bin/python3'));
+
+            $venvPath = env('PYTHON_VENV_PATH', 'C:\\Deteksi-AI\\python\\venv-311');
+            $pythonPath = $venvPath . '\\Scripts\\python.exe';
 
             if (!file_exists($pythonPath)) {
-                throw new \Exception("Python executable not found at: " . $pythonPath);
+                $pythonPath = env('PYTHON_PATH', 'C:\\Users\\Jijul\\AppData\\Local\\Programs\\Python\\Python311\\python.exe');
+                
+                if (!file_exists($pythonPath)) {
+                    throw new Exception("Python executable not found at: " . $pythonPath);
+                }
             }
 
-            $env = [
-                'PYTHONPATH' => dirname($pythonPath) . '/../lib/python3.11/site-packages',
-                'LD_LIBRARY_PATH' => '/usr/local/cuda/lib64:/usr/local/cuda/lib',
-                'TF_FORCE_GPU_ALLOW_GROWTH' => 'true',
+            Log::info("Using Python executable: " . $pythonPath);
+
+            $command = [
+                '"' . $pythonPath . '"',
+                '"' . $trainScript . '"',
+                (string) $this->split
             ];
 
-            $process = Process::timeout(10800)
-                ->env($env)
-                ->command([
-                    $pythonPath,
-                    $trainScript,
-                    (string) $this->split
-                ]);
+            Log::info("Executing command: " . implode(' ', $command));
 
-            $result = $process->run();
+            $result = Process::timeout(10800)
+                ->env([
+                    'PATH' => $venvPath . '\\Scripts;' . getenv('PATH')
+                ])
+                ->command($command)
+                ->run();
 
-            $output = trim($result->output());
-            $errorOutput = trim($result->errorOutput());
-
-            Log::info("Python output: " . $output);
-            if (!empty($errorOutput)) {
-                Log::warning("Python error output: " . $errorOutput);
-            }
-
-            if (!$result->successful()) {
-                throw new ProcessFailedException($process);
-            }
-
-            $cleanedOutput = $this->removeAnsiEscapeCodes($output);
-
-            $jsonStart = strpos($cleanedOutput, '{');
-            $jsonEnd = strrpos($cleanedOutput, '}');
-
-            if ($jsonStart === false || $jsonEnd === false) {
-                Log::error("Raw output for debugging: " . $cleanedOutput);
-                throw new \Exception('No JSON found in output');
-            }
-
-            $jsonString = substr($cleanedOutput, $jsonStart, $jsonEnd - $jsonStart + 1);
-
-            $resultData = json_decode($jsonString, true);
-
-            if (!$resultData || json_last_error() !== JSON_ERROR_NONE) {
-                Log::error("Raw JSON string for debugging: " . $jsonString);
-                Log::error("JSON error: " . json_last_error_msg());
-                throw new \Exception('Invalid JSON output: ' . json_last_error_msg());
-            }
-
-            if (isset($resultData['error'])) {
-                throw new \Exception($resultData['error']);
-            }
-
-            DB::transaction(function () use ($resultData) {
-                $trainingResult = TrainingResult::create([
-                    'accuracy'       => $resultData['accuracy'] ?? 0,
-                    'precision'      => $resultData['precision'] ?? 0,
-                    'recall'         => $resultData['recall'] ?? 0,
-                    'f1_score'       => $resultData['f1_score'] ?? 0,
-                    'confusion_matrix' => json_encode($resultData['confusion_matrix'] ?? []),
-                    'split_ratio'    => $this->split
-                ]);
-
-                Log::info("Training result saved with ID: " . $trainingResult->id);
-
-                if (!empty($resultData['predictions'])) {
-                    $this->updatePredictions($resultData['predictions']);
-                    Log::info("Updated " . count($resultData['predictions']) . " predictions");
-                }
-            });
-
-            Log::info("Training completed successfully");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Training job failed: " . $e->getMessage());
             Log::error($e->getTraceAsString());
             throw $e;
         }
-    }
+}
 
     private function removeAnsiEscapeCodes($string)
     {
